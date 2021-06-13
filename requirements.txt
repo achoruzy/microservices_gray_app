@@ -1,6 +1,7 @@
-fastapi==0.65.2
-celery==5.1.0
+fastapi==0.64.0
+celery==4.4.7
 redis==3.5.3
 pydantic==1.8.2
 SQLAlchemy==1.4.18
 plotly==4.14.3
+uvicorn==0.13.0
