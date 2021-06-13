@@ -15,16 +15,19 @@ services:
             - POSTGRES_DB=postgres
             - POSTGRES_USER=postgres
             - POSTGRES_PASSWORD=postgres
+            - CELERY_BROKER_URL=redis://redis:6379/0
+            - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
     # Web app container
     app:
         build: .
-        container_name: app
-        command: python main:app --host 0.0.0.0 --port 8080 --reload
-        volumes: 
-            - ./app:/usr/src/app
+        command: uvicorn main:app --host 0.0.0.0 --port 80 --reload
         ports: 
-            - 8080:8080
+            - 80:80
+        environment:
+            - CELERY_BROKER_URL=redis://redis:6379/0
+            - CELERY_RESULT_BACKEND=redis://redis:6379/0
+        container_name: app
         depends_on: 
             - db
             - redis
@@ -32,10 +35,13 @@ services:
     # Celery container
     celery:
         restart: always
-        build: 
-            context: .
+        build: .
+            #context: 
+        environment:
+            - CELERY_BROKER_URL=redis://redis:6379/0
+            - CELERY_RESULT_BACKEND=redis://redis:6379/0
+        command: celery worker --app=worker.celery --loglevel=info
         container_name: celery
-        command: celery -A celery worker -l INFO
         depends_on: 
             - db
             - redis
