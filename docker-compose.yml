@@ -1,0 +1,42 @@
+version: "3.8"
+services:
+
+    # Redis service container
+    redis:
+        image: redis:alpine
+        container_name: redis
+    
+    # Postgres DB container
+    db:
+        image: postgres:13.3-alpine
+        restart: always
+        container_name: db
+        environment: 
+            - POSTGRES_DB=postgres
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=postgres
+
+    # Web app container
+    app:
+        build: .
+        container_name: app
+        command: python main:app --host 0.0.0.0 --port 8080 --reload
+        volumes: 
+            - ./app:/usr/src/app
+        ports: 
+            - 8080:8080
+        depends_on: 
+            - db
+            - redis
+
+    # Celery container
+    celery:
+        restart: always
+        build: 
+            context: .
+        container_name: celery
+        command: celery -A celery worker -l INFO
+        depends_on: 
+            - db
+            - redis
+            - app
