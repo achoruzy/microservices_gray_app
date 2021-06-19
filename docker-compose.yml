@@ -13,8 +13,8 @@ services:
         container_name: db
         environment: 
             - POSTGRES_DB=postgres
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASSWORD=postgres
+            - POSTGRES_USER=postgres # to aquire from external source when production project
+            - POSTGRES_PASSWORD=postgres # to aquire from external source when production project
             - CELERY_BROKER_URL=redis://redis:6379/0
             - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
@@ -40,7 +40,8 @@ services:
         environment:
             - CELERY_BROKER_URL=redis://redis:6379/0
             - CELERY_RESULT_BACKEND=redis://redis:6379/0
-        command: celery worker --app=worker.celery --loglevel=info
+        command: celery worker --app=worker.celery --loglevel=info &&
+                python ./db/schema
         container_name: celery
         depends_on: 
             - db
