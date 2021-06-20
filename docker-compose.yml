@@ -9,6 +9,7 @@ services:
     # Postgres DB container
     db:
         image: postgres:13.3-alpine
+        # command: postgres -c logging_collector=on -c log_destination=stderr -c log_directory=/logs
         restart: always
         container_name: db
         environment: 
@@ -17,11 +18,16 @@ services:
             - POSTGRES_PASSWORD=postgres # to aquire from external source when production project
             - CELERY_BROKER_URL=redis://redis:6379/0
             - CELERY_RESULT_BACKEND=redis://redis:6379/0
+        ports:
+            - 5432:5432
+        # volumes:
+        #     - postgresVolume:/var/lib/postgresql/data
+        #     - ./logs:/logs
 
     # Web app container
     app:
         build: .
-        command: uvicorn main:app --host 0.0.0.0 --port 80 --reload
+        command: uvicorn main:api --host 0.0.0.0 --port 80 --reload
         ports: 
             - 80:80
         environment:
@@ -40,7 +46,7 @@ services:
         environment:
             - CELERY_BROKER_URL=redis://redis:6379/0
             - CELERY_RESULT_BACKEND=redis://redis:6379/0
-        command: celery worker --app=worker.celery --loglevel=info
+        command: celery worker --app=worker --loglevel=info
         container_name: celery
         depends_on: 
             - db
