@@ -6,7 +6,7 @@
 from sqlalchemy import create_engine
 import pandas as pd
 import requests
-import schema
+from schema import metadata
 
 csv_URL = 'https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv'
 
@@ -47,21 +47,26 @@ def cleanup_data(csv_dataframe):
     return df
 
 
-def build_db(url):
-    '''Function exports data achived from CSV to PostgreSQL database.
+def build_db(sql_url: str, db_address: str):
+    '''Function builds Postgres database with data achived from CSV.
+
+    Params:
+        sql_url (str): an URL link or a filepath to a CSV file
     '''
 
     if not check_csv:
         return Exception('CSV file not found')
 
-    dataset_raw = pd.read_sql(url)
+    dataset_raw = pd.read_sql(sql_url)
 
     dataset_clean = cleanup_data(dataset_raw)
 
-    engine = create_engine(db_URL)
+    engine = create_engine(db_address)
 
-    schema.metadata.create_all(engine)
+    metadata.create_all(engine)
+
+    return print(f'DB created from CSV file got from: {sql_url}')
 
 
 if __name__ == '__main__':
-    build_db()
+    build_db(csv_URL, db_URL)
