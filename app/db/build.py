@@ -6,33 +6,33 @@
 from sqlalchemy import create_engine
 import pandas as pd
 import requests
-from schema import metadata
+from .schema import metadata
 
-csv_URL = 'https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv'
+csv_URL = "https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv"
 
-db_login = 'postgres'  # to aquire from external source when production project
-db_password = 'postgres'  # to aquire from external source when production project
-db_URL = f'postgresql://{db_login}:{db_password}@localhost:5432/postgres'
+db_login = "postgres"  # to aquire from external source when production project
+db_password = "postgres"  # to aquire from external source when production project
+db_URL = f"postgresql://{db_login}:{db_password}@0.0.0.0:5432/postgres"
 
 
 def check_csv(url: str) -> bool:
-    '''Function checks if a CSV file is available.
+    """Function checks if a CSV file is available.
 
     Params:
         url (str): an URL link or a filepath to a CSV file
 
     Returns:
         bool: True if the CSV file is available
-    '''
+    """
     status_code = requests.get(csv_URL).status_code
 
-    if status_code == '200':
+    if status_code == "200":
         return True
     return False
 
 
 def cleanup_data(csv_dataframe):
-    '''Function cleans up the data got as csv_dataframe and prepares it
+    """Function cleans up the data got as csv_dataframe and prepares it
     to be exported into database.
 
     Params:
@@ -40,24 +40,26 @@ def cleanup_data(csv_dataframe):
 
     Returns:
         pandas.Dataframe
-    '''
-    df = pd.DataFrame(csv_dataframe, columns=[
-                      'School Name', 'Category', 'Total Enrollment', '%Female', '%Male'])
+    """
+    df = pd.DataFrame(
+        csv_dataframe,
+        columns=["School Name", "Category", "Total Enrollment", "%Female", "%Male"],
+    )
 
     return df
 
 
-def build_db(sql_url: str, db_address: str):
-    '''Function builds Postgres database with data achived from CSV.
+def build_db(csv_url: str, db_address: str):
+    """Function builds Postgres database with data achived from CSV.
 
     Params:
         sql_url (str): an URL link or a filepath to a CSV file
-    '''
+    """
 
     if not check_csv:
-        return Exception('CSV file not found')
+        return Exception("CSV file not found")
 
-    dataset_raw = pd.read_sql(sql_url)
+    dataset_raw = pd.read_csv(csv_url)
 
     dataset_clean = cleanup_data(dataset_raw)
 
@@ -65,8 +67,15 @@ def build_db(sql_url: str, db_address: str):
 
     metadata.create_all(engine)
 
-    return print(f'DB created from CSV file got from: {sql_url}')
+    dataset_clean.to_sql("postgres", engine, chunksize=2000)
+
+    return print(f"DB created from CSV file got from: {sql_url}")
 
 
-if __name__ == '__main__':
+def run_db():
+    """Function runs database build process."""
     build_db(csv_URL, db_URL)
+
+
+if __name__ == "__main__":
+    pass
