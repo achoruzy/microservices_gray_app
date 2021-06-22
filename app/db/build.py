@@ -4,6 +4,7 @@
 #   achoruzy@gmail.com
 
 from sqlalchemy import create_engine
+import psycopg2
 import pandas as pd
 import requests
 from .schema import metadata
@@ -12,7 +13,7 @@ csv_URL = "https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv"
 
 db_login = "postgres"  # to aquire from external source when production project
 db_password = "postgres"  # to aquire from external source when production project
-db_URL = f"postgresql://{db_login}:{db_password}@0.0.0.0:5432/postgres"
+db_URL = f"postgresql+psycopg2://{db_login}:{db_password}@db:5432/postgres"
 
 
 def check_csv(url: str) -> bool:
@@ -27,7 +28,10 @@ def check_csv(url: str) -> bool:
     status_code = requests.get(csv_URL).status_code
 
     if status_code == "200":
+        print("CSV status code: 200")
         return True
+
+    print("Can't connect to CSV file.")
     return False
 
 
@@ -56,20 +60,20 @@ def build_db(csv_url: str, db_address: str):
         sql_url (str): an URL link or a filepath to a CSV file
     """
 
-    if not check_csv:
-        return Exception("CSV file not found")
+    # if not check_csv:
+    #     return Exception("CSV file not found")
 
-    dataset_raw = pd.read_csv(csv_url)
+    # dataset_raw = pd.read_csv(csv_url)
 
-    dataset_clean = cleanup_data(dataset_raw)
+    # dataset_clean = cleanup_data(dataset_raw)
 
     engine = create_engine(db_address)
 
-    metadata.create_all(engine)
+    # metadata.create_all(engine)
 
-    dataset_clean.to_sql("postgres", engine, chunksize=2000)
+    # dataset_clean.to_sql("postgres", engine, chunksize=2000)
 
-    return print(f"DB created from CSV file got from: {sql_url}")
+    return print(f"DB created from CSV file got from: {csv_url}")
 
 
 def run_db():
