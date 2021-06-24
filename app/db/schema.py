@@ -20,7 +20,7 @@ category = Table(
     "category",
     metadata,
     Column("category_id", Integer, primary_key=True),
-    Column("category_name", Text, nullable=False),
+    Column("category", Text, nullable=False),
 )
 
 school_data = Table(
@@ -28,6 +28,8 @@ school_data = Table(
     metadata,
     Column("data_id", Integer, primary_key=True),
     Column("total_enrollment", Integer, nullable=False),
+    Column("female", Integer, nullable=False),
+    Column("male", Integer, nullable=False),
     Column("school_id", ForeignKey(school.c.school_id)),
     Column("category_id", ForeignKey(category.c.category_id)),
 )
