@@ -4,7 +4,7 @@
 #   achoruzy@gmail.com
 
 from sqlalchemy import create_engine
-import psycopg2
+from sqlalchemy.orm import Session
 import pandas as pd
 import requests
 from .schema import metadata
@@ -47,7 +47,7 @@ def cleanup_data(csv_dataframe):
     """
     df = pd.DataFrame(
         csv_dataframe,
-        columns=["School Name", "Category", "Total Enrollment", "%Female", "%Male"],
+        columns=["School Name", "Category", "Total Enrollment", "Female", "Male"],
     )
 
     return df
@@ -60,25 +60,28 @@ def build_db(csv_url: str, db_address: str):
         sql_url (str): an URL link or a filepath to a CSV file
     """
 
-    # if not check_csv:
-    #     return Exception("CSV file not found")
+    # Check for CSV file
+    if not check_csv:
+        return Exception("CSV file not found")
 
-    # dataset_raw = pd.read_csv(csv_url)
+    # Prepare dataset
+    dataset_raw = pd.read_csv(csv_url)
 
     # dataset_clean = cleanup_data(dataset_raw)
 
-    engine = create_engine(db_address)
+    # Connect and upload the data to db
+    engine = create_engine(db_address, echo=True)
 
-    # metadata.create_all(engine)
+    metadata.create_all(engine)
 
     # dataset_clean.to_sql("postgres", engine, chunksize=2000)
-
-    return print(f"DB created from CSV file got from: {csv_url}")
 
 
 def run_db():
     """Function runs database build process."""
     build_db(csv_URL, db_URL)
+
+    return print(f"DB created from CSV file got from: {csv_URL}")
 
 
 if __name__ == "__main__":
