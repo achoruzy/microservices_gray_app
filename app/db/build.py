@@ -45,12 +45,30 @@ def cleanup_data(csv_dataframe):
     Returns:
         pandas.Dataframe
     """
-    df = pd.DataFrame(
+    df_school = pd.DataFrame(
         csv_dataframe,
-        columns=["School Name", "Category", "Total Enrollment", "Female", "Male"],
+        columns=["School Name", "Category", "Total Enrollment", "#Female", "#Male"],
     )
 
-    return df
+    df_category = pd.DataFrame(
+        csv_dataframe,
+        columns=["Category"],
+    )
+
+    df_school_data = pd.DataFrame(
+        csv_dataframe,
+        columns=["Total Enrollment", "#Female", "#Male"],
+    )
+
+    # Clean-up column names
+    dataframes = [df_school, df_category, df_school_data]
+
+    for df in dataframes:
+        df.columns = [
+            title.lower().replace(" ", "_").replace("#", "") for title in df.columns
+        ]
+
+    return dataframes
 
 
 def build_db(csv_url: str, db_address: str):
@@ -67,14 +85,16 @@ def build_db(csv_url: str, db_address: str):
     # Prepare dataset
     dataset_raw = pd.read_csv(csv_url)
 
-    # dataset_clean = cleanup_data(dataset_raw)
+    dataset_clean = cleanup_data(dataset_raw)
 
-    # Connect and upload the data to db
+    # Connect to db -> create table with schema
     engine = create_engine(db_address, echo=True)
 
     metadata.create_all(engine)
 
-    # dataset_clean.to_sql("postgres", engine, chunksize=2000)
+    dataset_clean[0].to_sql(
+        "school", engine, if_exists="append", chunksize=2000, index=True
+    )
 
 
 def run_db():
