@@ -4,7 +4,6 @@
 #   achoruzy@gmail.com
 
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
 import pandas as pd
 import requests
 from .schema import metadata
@@ -47,7 +46,7 @@ def cleanup_data(csv_dataframe):
     """
     df_school = pd.DataFrame(
         csv_dataframe,
-        columns=["School Name", "Category", "Total Enrollment", "#Female", "#Male"],
+        columns=["School Name"],
     )
 
     df_category = pd.DataFrame(
@@ -87,14 +86,18 @@ def build_db(csv_url: str, db_address: str):
 
     dataset_clean = cleanup_data(dataset_raw)
 
-    # Connect to db -> create table with schema
+    # Connect to db -> create tables with schema
     engine = create_engine(db_address, echo=True)
 
     metadata.create_all(engine)
 
-    dataset_clean[0].to_sql(
-        "school", engine, if_exists="append", chunksize=2000, index=True
-    )
+    # Upload the data to the database
+    db_tables = ("school", "category", "school_data")
+
+    for i in range(0, 3):
+        dataset_clean[i].to_sql(
+            db_tables[i], engine, if_exists="append", chunksize=2000, index=False
+        )
 
 
 def run_db():
