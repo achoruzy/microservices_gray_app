@@ -12,24 +12,24 @@ metadata = MetaData()
 school = Table(
     "school",
     metadata,
-    Column("school_id", Integer, primary_key=True),
-    Column("school_name", Text, nullable=False),
+    Column("id", Integer, primary_key=True),
+    Column("school_name", Text, nullable=True, unique=True),
 )
 
 category = Table(
     "category",
     metadata,
-    Column("category_id", Integer, primary_key=True),
-    Column("category", Text, nullable=False),
+    Column("id", Integer, primary_key=True),
+    Column("category", Text, nullable=False, unique=True),
 )
 
 school_data = Table(
     "school_data",
     metadata,
-    Column("data_id", Integer, primary_key=True),
+    Column("id", Integer, primary_key=True),
     Column("total_enrollment", Integer, nullable=False),
     Column("female", Integer, nullable=False),
     Column("male", Integer, nullable=False),
-    Column("school_id", ForeignKey(school.c.school_id)),
-    Column("category_id", ForeignKey(category.c.category_id)),
+    Column("school_id", ForeignKey(school.c.id)),
+    Column("category_id", ForeignKey(category.c.id)),
 )
