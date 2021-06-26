@@ -5,6 +5,7 @@
 
 from sqlalchemy import MetaData, Table, Column, Text, Integer, Float
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import relationship
 
 
 metadata = MetaData()
@@ -13,7 +14,7 @@ school = Table(
     "school",
     metadata,
     Column("id", Integer, primary_key=True),
-    Column("school_name", Text, nullable=True, unique=True),
+    Column("school_name", Text, nullable=False, unique=True),
 )
 
 category = Table(

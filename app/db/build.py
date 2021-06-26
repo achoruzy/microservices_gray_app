@@ -48,11 +48,14 @@ def cleanup_data(csv_dataframe):
         csv_dataframe,
         columns=["School Name"],
     )
+    df_school.dropna()
+    df_school.reset_index()
 
     df_category = pd.DataFrame(
         csv_dataframe,
         columns=["Category"],
     )
+    df_category.dropna()
 
     df_school_data = pd.DataFrame(
         csv_dataframe,
@@ -96,7 +99,7 @@ def build_db(csv_url: str, db_address: str):
 
     for i in range(0, 3):
         dataset_clean[i].to_sql(
-            db_tables[i], engine, if_exists="append", chunksize=2000, index=False
+            db_tables[i], engine, if_exists="replace", chunksize=2000, index=False
         )
 
 
