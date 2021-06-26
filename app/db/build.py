@@ -44,30 +44,45 @@ def cleanup_data(csv_dataframe):
     Returns:
         pandas.Dataframe
     """
-    df_school = pd.DataFrame(
+    # df_school = pd.DataFrame(
+    #     csv_dataframe,
+    #     columns=["School Name"],
+    # )
+    # df_school.dropna()
+    # df_school.reset_index()
+
+    # df_category = pd.DataFrame(
+    #     csv_dataframe,
+    #     columns=["Category"],
+    # )
+    # df_category.dropna()
+
+    # df_school_data = pd.DataFrame(
+    #     csv_dataframe,
+    #     columns=["Total Enrollment", "#Female", "#Male"],
+    # )
+
+    df = pd.DataFrame(
         csv_dataframe,
-        columns=["School Name"],
+        columns=["School Name", "Category", "Total Enrollment", "#Female", "#Male"],
     )
 
-    df_category = pd.DataFrame(
-        csv_dataframe,
-        columns=["Category"],
-    )
-
-    df_school_data = pd.DataFrame(
-        csv_dataframe,
-        columns=["Total Enrollment", "#Female", "#Male"],
-    )
+    df.dropna(axis=0)
+    df.reset_index()
 
     # Clean-up column names
-    dataframes = [df_school, df_category, df_school_data]
+    # dataframes = [df_school, df_category, df_school_data]
 
-    for df in dataframes:
-        df.columns = [
-            title.lower().replace(" ", "_").replace("#", "") for title in df.columns
-        ]
+    # for df in dataframes:
+    #     df.columns = [
+    #         title.lower().replace(" ", "_").replace("#", "") for title in df.columns
+    #     ]
 
-    return dataframes
+    df.columns = [
+        title.lower().replace(" ", "_").replace("#", "") for title in df.columns
+    ]
+
+    return df
 
 
 def build_db(csv_url: str, db_address: str):
@@ -92,12 +107,19 @@ def build_db(csv_url: str, db_address: str):
     metadata.create_all(engine)
 
     # Upload the data to the database
-    db_tables = ("school", "category", "school_data")
+    db_tables = {
+        "school": ["school_name"],
+        "category": ["category_name"],
+        "school_data": ["total_enrollment", "female", "male"],
+    }
 
-    for i in range(0, 3):
-        dataset_clean[i].to_sql(
-            db_tables[i], engine, if_exists="append", chunksize=2000, index=False
-        )
+    for table_name in db_tables:
+        df = pd.DataFrame(dataset_clean, columns=db_tables.get(table_name))
+        df.to_sql(table_name, engine, if_exists="append", chunksize=2000, index=False)
+
+    # dataset_clean.to_sql(
+    #     db_tables, engine, if_exists="append", chunksize=2000, index=False
+    # )
 
 
 def run_db():
