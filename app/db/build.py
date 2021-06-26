@@ -67,7 +67,7 @@ def cleanup_data(csv_dataframe):
         columns=["School Name", "Category", "Total Enrollment", "#Female", "#Male"],
     )
 
-    df.dropna()
+    df.dropna(axis=0)
     df.reset_index()
 
     # Clean-up column names
@@ -107,16 +107,19 @@ def build_db(csv_url: str, db_address: str):
     metadata.create_all(engine)
 
     # Upload the data to the database
-    # db_tables = ("school", "category", "school_data")
+    db_tables = {
+        "school": ["school_name"],
+        "category": ["category_name"],
+        "school_data": ["total_enrollment", "female", "male"],
+    }
 
-    # for i in range(0, 3):
-    #     dataset_clean[i].to_sql(
-    #         db_tables[i], engine, if_exists="append", chunksize=2000, index=False
-    #     )
+    for table_name in db_tables:
+        df = pd.DataFrame(dataset_clean, columns=db_tables.get(table_name))
+        df.to_sql(table_name, engine, if_exists="append", chunksize=2000, index=False)
 
-    dataset_clean.to_sql(
-        db_tables, engine, if_exists="append", chunksize=2000, index=False
-    )
+    # dataset_clean.to_sql(
+    #     db_tables, engine, if_exists="append", chunksize=2000, index=False
+    # )
 
 
 def run_db():
