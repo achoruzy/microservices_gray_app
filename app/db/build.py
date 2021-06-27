@@ -44,43 +44,35 @@ def cleanup_data(csv_dataframe):
     Returns:
         pandas.Dataframe
     """
-    # df_school = pd.DataFrame(
-    #     csv_dataframe,
-    #     columns=["School Name"],
-    # )
-    # df_school.dropna()
-    # df_school.reset_index()
 
-    # df_category = pd.DataFrame(
-    #     csv_dataframe,
-    #     columns=["Category"],
-    # )
-    # df_category.dropna()
-
-    # df_school_data = pd.DataFrame(
-    #     csv_dataframe,
-    #     columns=["Total Enrollment", "#Female", "#Male"],
-    # )
-
+    # Get desired columns to pd.df
     df = pd.DataFrame(
         csv_dataframe,
         columns=["School Name", "Category", "Total Enrollment", "#Female", "#Male"],
     )
 
-    df.dropna(axis=0)
-    df.reset_index()
-
-    # Clean-up column names
-    # dataframes = [df_school, df_category, df_school_data]
-
-    # for df in dataframes:
-    #     df.columns = [
-    #         title.lower().replace(" ", "_").replace("#", "") for title in df.columns
-    #     ]
-
+    # Enchance column titles to proper format and to be consistens with db schema
     df.columns = [
         title.lower().replace(" ", "_").replace("#", "") for title in df.columns
     ]
+
+    # Drop rows with NaN and reset df indexes
+    df = df.dropna(axis=0)
+    df.reset_index()
+
+    df = df.drop(
+        df[(df.total_enrollment == "s") | (df.female == "s") | (df.male != "s")].index
+    )
+
+    datatypes = {
+        "school_name": str,
+        "category": str,
+        "total_enrollment": int,
+        "female": int,
+        "male": int,
+    }
+
+    df = df.astype(datatypes)
 
     return df
 
@@ -101,25 +93,35 @@ def build_db(csv_url: str, db_address: str):
 
     dataset_clean = cleanup_data(dataset_raw)
 
+    print("Dataset cleaned...")
+
     # Connect to db -> create tables with schema
-    engine = create_engine(db_address, echo=True)
+    engine = create_engine(db_address, echo=False)
 
     metadata.create_all(engine)
+
+    print("Schema created...")
 
     # Upload the data to the database
     db_tables = {
         "school": ["school_name"],
-        "category": ["category_name"],
+        "category": ["category"],
         "school_data": ["total_enrollment", "female", "male"],
     }
 
     for table_name in db_tables:
         df = pd.DataFrame(dataset_clean, columns=db_tables.get(table_name))
-        df.to_sql(table_name, engine, if_exists="append", chunksize=2000, index=False)
 
-    # dataset_clean.to_sql(
-    #     db_tables, engine, if_exists="append", chunksize=2000, index=False
-    # )
+        df.drop_duplicates(inplace=True, ignore_index=True)
+
+        df.to_sql(
+            table_name,
+            engine,
+            if_exists="append",
+            index=False,
+        )
+
+        print(f"Data imported into <{table_name}> table.")
 
 
 def run_db():
