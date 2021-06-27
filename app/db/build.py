@@ -56,12 +56,12 @@ def cleanup_data(csv_dataframe):
         title.lower().replace(" ", "_").replace("#", "") for title in df.columns
     ]
 
-    # Drop rows with NaN and reset df indexes
+    # Drop rows with NaN, wrong data and reset df indexes
     df = df.dropna(axis=0)
     df.reset_index()
 
     df = df.drop(
-        df[(df.total_enrollment == "s") | (df.female == "s") | (df.male != "s")].index
+        df[(df.total_enrollment == "s") | (df.female == "s") | (df.male == "s")].index
     )
 
     datatypes = {
@@ -97,6 +97,10 @@ def build_db(csv_url: str, db_address: str):
 
     # Connect to db -> create tables with schema
     engine = create_engine(db_address, echo=False)
+
+    with engine.connect() as con:
+        sql_drop_old = "DROP TABLE IF EXISTS school_name, category, total_enrollment, female, male CASCADE;"
+        con.execute(sql_drop_old)
 
     metadata.create_all(engine)
 
