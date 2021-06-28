@@ -3,7 +3,7 @@
 #   Arkadiusz Choruzy
 #   achoruzy@gmail.com
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, MetaData
 import pandas as pd
 import requests
 from .schema import metadata
@@ -64,6 +64,7 @@ def cleanup_data(csv_dataframe):
         df[(df.total_enrollment == "s") | (df.female == "s") | (df.male == "s")].index
     )
 
+    # Set proper datatypes for columns
     datatypes = {
         "school_name": str,
         "category": str,
@@ -77,7 +78,7 @@ def cleanup_data(csv_dataframe):
     return df
 
 
-def build_db(csv_url: str, db_address: str):
+def build_db(csv_url: str = csv_URL, db_address: str = db_URL):
     """Function builds Postgres database with data achived from CSV.
 
     Params:
@@ -88,25 +89,25 @@ def build_db(csv_url: str, db_address: str):
     if not check_csv:
         return Exception("CSV file not found")
 
-    # Prepare dataset
+    # Prepare dataset to match db schema
     dataset_raw = pd.read_csv(csv_url)
-
     dataset_clean = cleanup_data(dataset_raw)
-
     print("Dataset cleaned...")
 
-    # Connect to db -> create tables with schema
+    # Connect to db -> drop schema if exists -> create tables with schema
     engine = create_engine(db_address, echo=False)
 
-    with engine.connect() as con:
-        sql_drop_old = "DROP TABLE IF EXISTS school_name, category, total_enrollment, female, male CASCADE;"
-        con.execute(sql_drop_old)
+    # Drop schema tables
+    meta = MetaData(engine)
+    meta.reflect()
+    meta.drop_all()
+    print("Schema dropped...")
 
+    # Create new db tables with schema
     metadata.create_all(engine)
-
     print("Schema created...")
 
-    # Upload the data to the database
+    # Import the data to the database
     db_tables = {
         "school": ["school_name"],
         "category": ["category"],
@@ -115,24 +116,16 @@ def build_db(csv_url: str, db_address: str):
 
     for table_name in db_tables:
         df = pd.DataFrame(dataset_clean, columns=db_tables.get(table_name))
-
         df.drop_duplicates(inplace=True, ignore_index=True)
-
         df.to_sql(
             table_name,
             engine,
             if_exists="append",
             index=False,
         )
-
         print(f"Data imported into <{table_name}> table.")
 
-
-def run_db():
-    """Function runs database build process."""
-    build_db(csv_URL, db_URL)
-
-    return print(f"DB created from CSV file got from: {csv_URL}")
+    return print(f"DB created from CSV file downloaded from: {csv_URL}")
 
 
 if __name__ == "__main__":

@@ -7,7 +7,7 @@ import os
 import time
 from celery import Celery
 from celery.signals import worker_ready
-from db.build import run_db
+from db.build import build_db
 
 
 celery = Celery(__name__)
@@ -19,9 +19,9 @@ celery.conf.result_backend = os.environ.get(
 
 @worker_ready.connect
 def on_worker_ready(**kwargs):
-    # try:
-    #     run_db()
-    # except:
-    #     print("Database haven't build. An error occured.")
+    """Celery worker function for database creation at docker container start."""
 
-    run_db()
+    try:
+        build_db()
+    except RuntimeError:
+        print("Database haven't been build. An error occured.")
