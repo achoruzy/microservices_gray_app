@@ -116,7 +116,8 @@ def build_db(csv_url: str = csv_URL, db_address: str = db_URL):
 
     for table_name in db_tables:
         df = pd.DataFrame(dataset_clean, columns=db_tables.get(table_name))
-        df.drop_duplicates(inplace=True, ignore_index=True)
+        if table_name != "shool_data":
+            df.drop_duplicates(inplace=True, ignore_index=True)
         df.to_sql(
             table_name,
             engine,
