@@ -14,9 +14,18 @@ db_login = "postgres"  # to aquire from external source when production project
 db_password = "postgres"  # to aquire from external source when production project
 db_URL = f"postgresql+psycopg2://{db_login}:{db_password}@db:5432/postgres"
 
+TABLE = "school_data"
+COLUMNS = {
+    "School Name": str,
+    "Category": str,
+    "Total Enrollment": int,
+    "#Female": int,
+    "#Male": int,
+}
+
 
 def check_csv(url: str) -> bool:
-    """Function checks if a CSV file is available.
+    """Function checks if the CSV file is available.
 
     Params:
         url (str): an URL link or a filepath to a CSV file
@@ -30,25 +39,25 @@ def check_csv(url: str) -> bool:
         print("CSV status code: 200")
         return True
 
-    print("Can't connect to CSV file.")
+    print("Error: Can't connect to CSV file.")
     return False
 
 
-def cleanup_data(csv_dataframe):
+def cleanup_data(csv_dataframe, columns: dict = COLUMNS):
     """Function cleans up the data got as csv_dataframe and prepares it
     to be exported into database.
 
     Params:
         scv_dataframe (pandas.DataFrame): a CSV file parsed to pandas.DataFrame object
+        columns (dict: {str: type}): a dictiodnary in type {"column name from csv_dataframe": wanted datatype}
 
     Returns:
         pandas.Dataframe
     """
-
     # Get desired columns to pd.df
     df = pd.DataFrame(
         csv_dataframe,
-        columns=["School Name", "Category", "Total Enrollment", "#Female", "#Male"],
+        columns=columns,
     )
 
     # Enchance column titles to proper format and to be consistens with db schema
@@ -56,23 +65,17 @@ def cleanup_data(csv_dataframe):
         title.lower().replace(" ", "_").replace("#", "") for title in df.columns
     ]
 
-    # Drop rows with NaN, wrong data and reset df indexes
+    # Drop rows with NaN or wrong data
     df = df.dropna(axis=0)
-    df.reset_index()
-
     df = df.drop(
         df[(df.total_enrollment == "s") | (df.female == "s") | (df.male == "s")].index
     )
 
-    # Set proper datatypes for columns
+    # Set datatypes for columns
     datatypes = {
-        "school_name": str,
-        "category": str,
-        "total_enrollment": int,
-        "female": int,
-        "male": int,
+        col.lower().replace(" ", "_").replace("#", ""): typ
+        for (col, typ) in columns.items()
     }
-
     df = df.astype(datatypes)
 
     return df
@@ -83,6 +86,7 @@ def build_db(csv_url: str = csv_URL, db_address: str = db_URL):
 
     Params:
         sql_url (str): an URL link or a filepath to a CSV file
+        db_address (str): a database host address to connect
     """
 
     # Check for CSV file
@@ -94,8 +98,9 @@ def build_db(csv_url: str = csv_URL, db_address: str = db_URL):
     dataset_clean = cleanup_data(dataset_raw)
     print("Dataset cleaned...")
 
-    # Connect to db -> drop schema if exists -> create tables with schema
+    # Connection to db
     engine = create_engine(db_address, echo=False)
+    print("DB connection established...")
 
     # Drop schema tables
     meta = MetaData(engine)
@@ -108,25 +113,18 @@ def build_db(csv_url: str = csv_URL, db_address: str = db_URL):
     print("Schema created...")
 
     # Import the data to the database
-    db_tables = {
-        "school": ["school_name"],
-        "category": ["category"],
-        "school_data": ["total_enrollment", "female", "male"],
-    }
+    table = list(meta.tables.keys())[0]
 
-    for table_name in db_tables:
-        df = pd.DataFrame(dataset_clean, columns=db_tables.get(table_name))
-        if table_name != "shool_data":
-            df.drop_duplicates(inplace=True, ignore_index=True)
-        df.to_sql(
-            table_name,
-            engine,
-            if_exists="append",
-            index=False,
-        )
-        print(f"Data imported into <{table_name}> table.")
+    dataset_clean.to_sql(
+        table,
+        engine,
+        if_exists="append",
+        index=False,
+    )
+    print(f"Fresh data imported into <{table}> table.")
+    print(f"DB created from CSV file downloaded from: {csv_URL}")
 
-    return print(f"DB created from CSV file downloaded from: {csv_URL}")
+    return
 
 
 if __name__ == "__main__":
