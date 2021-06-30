@@ -27,13 +27,15 @@ services:
     # Web app container
     app:
         build: .
-        command: uvicorn main:api --host 0.0.0.0 --port 80 --reload
         ports: 
-            - 80:80
+            - "8000:8000"
         environment:
             - CELERY_BROKER_URL=redis://redis:6379/0
             - CELERY_RESULT_BACKEND=redis://redis:6379/0
         container_name: app
+        volumes:
+            - "./app:/app"
+        command: uvicorn main:api --host 0.0.0.0 --port 8000 --reload
         depends_on: 
             - db
             - redis
@@ -55,4 +57,5 @@ services:
 
 volumes:
     data:
-#     logs:
+#   logs:
+    app:
