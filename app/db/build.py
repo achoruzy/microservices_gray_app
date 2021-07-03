@@ -6,8 +6,7 @@
 from sqlalchemy import create_engine, MetaData
 import pandas as pd
 import requests
-from .schema import metadata
-from . import database
+from . import database, models
 
 CSV_URL = "https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv"
 
@@ -98,7 +97,7 @@ def build_db(csv_url: str = CSV_URL):
     print("Schema dropped...")
 
     # Create new db tables with schema
-    metadata.create_all(engine)
+    models.Base.metadata.create_all(bind=engine)
     print("Schema created...")
 
     # Import the data to the database
