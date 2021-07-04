@@ -6,22 +6,12 @@
 from sqlalchemy import create_engine, MetaData
 import pandas as pd
 import requests
-from .schema import metadata
+from . import database, models
 
-csv_URL = "https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv"
+CSV_URL = "https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv"
 
-db_login = "postgres"  # to aquire from external source when production project
-db_password = "postgres"  # to aquire from external source when production project
-db_URL = f"postgresql+psycopg2://{db_login}:{db_password}@db:5432/postgres"
-
-TABLE = "school_data"
-COLUMNS = {
-    "School Name": str,
-    "Category": str,
-    "Total Enrollment": int,
-    "#Female": int,
-    "#Male": int,
-}
+TABLE = database.TABLE
+COLUMNS = database.COLUMNS
 
 
 def check_csv(url: str) -> bool:
@@ -33,7 +23,7 @@ def check_csv(url: str) -> bool:
     Returns:
         bool: True if the CSV file is available
     """
-    status_code = requests.get(csv_URL).status_code
+    status_code = requests.get(CSV_URL).status_code
 
     if status_code == "200":
         print("CSV status code: 200")
@@ -81,12 +71,11 @@ def cleanup_data(csv_dataframe, columns: dict = COLUMNS):
     return df
 
 
-def build_db(csv_url: str = csv_URL, db_address: str = db_URL):
+def build_db(csv_url: str = CSV_URL):
     """Function builds Postgres database with data achived from CSV.
 
     Params:
         sql_url (str): an URL link or a filepath to a CSV file
-        db_address (str): a database host address to connect
     """
 
     # Check for CSV file
@@ -99,7 +88,7 @@ def build_db(csv_url: str = csv_URL, db_address: str = db_URL):
     print("Dataset cleaned...")
 
     # Connection to db
-    engine = create_engine(db_address, echo=False)
+    engine = database.engine
     print("DB connection established...")
 
     # Drop schema tables
@@ -109,20 +98,18 @@ def build_db(csv_url: str = csv_URL, db_address: str = db_URL):
     print("Schema dropped...")
 
     # Create new db tables with schema
-    metadata.create_all(engine)
+    models.Base.metadata.create_all(bind=engine)
     print("Schema created...")
 
     # Import the data to the database
-    table = list(meta.tables.keys())[0]
-
     dataset_clean.to_sql(
-        table,
+        TABLE,
         engine,
         if_exists="append",
         index=False,
     )
-    print(f"Fresh data imported into <{table}> table.")
-    print(f"DB created from CSV file downloaded from: {csv_URL}")
+    print(f"Fresh data imported into <{TABLE}> table.")
+    print(f"DB created from CSV file downloaded from: {CSV_URL}")
 
     return
 
