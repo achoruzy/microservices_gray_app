@@ -10,6 +10,7 @@ from . import database, models
 
 CSV_URL = "https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv"
 
+TABLE = database.TABLE
 COLUMNS = database.COLUMNS
 
 
@@ -101,15 +102,13 @@ def build_db(csv_url: str = CSV_URL):
     print("Schema created...")
 
     # Import the data to the database
-    table = list(meta.tables.keys())[0]
-
     dataset_clean.to_sql(
-        table,
+        TABLE,
         engine,
         if_exists="append",
         index=False,
     )
-    print(f"Fresh data imported into <{table}> table.")
+    print(f"Fresh data imported into <{TABLE}> table.")
     print(f"DB created from CSV file downloaded from: {CSV_URL}")
 
     return
