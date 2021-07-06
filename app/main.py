@@ -8,6 +8,9 @@ from typing import Optional
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from . import schemas
+from .db import models, database
+
 
 class Item(BaseModel):
     school_name: str
@@ -31,3 +34,8 @@ async def filter_data(
     male: Optional[bool] = True,
 ):
     return {"school name": [school_name, category, pupils_more_than, female, male]}
+
+
+@api.get("/datarow")
+async def datarow():
+    pass
