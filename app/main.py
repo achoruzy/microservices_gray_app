@@ -7,9 +7,12 @@ from typing import Optional
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+import pandas as pd
 
-from . import schemas
-from .db import models, database
+import plotly.express as pex
+
+import schemas, crud
+from db import models, database
 
 
 class Item(BaseModel):
@@ -18,6 +21,12 @@ class Item(BaseModel):
 
 api = FastAPI()
 
+# -- PLOT --
+def plot(data):
+    df = pd.DataFrame(data)
+    chart = pex.line(data_frame=df)
+    return chart.show()
+
 
 @api.get("/")
 def read_root():
@@ -25,17 +34,21 @@ def read_root():
 
 
 @api.get("/filter")
-async def filter_data(
-    school_name: Optional[str] = None,
-    category: Optional[str] = None,
-    pupils_more_than: Optional[int] = None,
-    pupils_less_than: Optional[int] = None,
-    female: Optional[bool] = True,
-    male: Optional[bool] = True,
-):
-    return {"school name": [school_name, category, pupils_more_than, female, male]}
+async def filter_data(school_name: str, category: str):
+    with database.SessionLocal() as session:
+        data = crud.get_dataset_filtered(session, school_name, category)
+    return data
 
 
 @api.get("/datarow")
-async def datarow():
-    pass
+async def datarow(id: int):
+    with database.SessionLocal() as session:
+        data = crud.get_datarow(session, id)
+    return data
+
+
+@api.get("/all_data")
+async def all_data():
+    with database.SessionLocal() as session:
+        data = crud.get_all(session)
+    return data
