@@ -21,11 +21,41 @@ def get_all(db: Session):
 
 def get_dataset_filtered(
     db: Session,
-    school_name: Optional[str],
-    category: Optional[str],
+    school_name: Optional[str] = None,
+    category: Optional[str] = None,
+    gender: Optional[str] = None,
+    more_than: Optional[int] = None,
+    less_than: Optional[int] = None,
 ):
-    query = (
-        db.query(models.Data)
-        .filter_by(school_name=school_name, category=category)
-        .all()
-    )
+
+    query = db.query(models.Data)
+
+    if school_name != None:
+        query = query.filter_by(school_name=school_name)
+
+    if category != None:
+        query = query.filter_by(category=category)
+
+    genders_available = [
+        ["female", "girls", "girl", "women"],
+        ["male", "boys", "boy", "men"],
+        ["both", "all", "unisex"],
+    ]
+
+    if gender == None or gender.lower() in genders_available[2]:
+        if more_than != None:
+            query = query.filter(models.Data.total_enrollment > more_than)
+        if less_than != None:
+            query = query.filter(models.Data.total_enrollment < less_than)
+    elif gender.lower() in genders_available[0]:
+        if more_than != None:
+            query = query.filter(models.Data.female > more_than)
+        if less_than != None:
+            query = query.filter(models.Data.female < less_than)
+    elif gender.lower() in genders_available[1]:
+        if more_than != None:
+            query = query.filter(models.Data.male > more_than)
+        if less_than != None:
+            query = query.filter(models.Data.male < less_than)
+
+    return query.all()

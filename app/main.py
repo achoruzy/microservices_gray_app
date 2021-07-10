@@ -34,9 +34,18 @@ def read_root():
 
 
 @api.get("/filter")
-async def filter_data(school_name: str, category: str):
+async def filter_data(
+    school_name: Optional[str] = None,
+    category: Optional[str] = None,
+    gender: Optional[str] = None,
+    more_than: Optional[int] = None,
+    less_than: Optional[int] = None,
+):
+
     with database.SessionLocal() as session:
-        data = crud.get_dataset_filtered(session, school_name, category)
+        data = crud.get_dataset_filtered(
+            session, school_name, category, gender, more_than, less_than
+        )
     return data
 
 
