@@ -4,6 +4,7 @@
 #   achoruzy@gmail.com
 
 from typing import Optional
+import dataclasses
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -21,11 +22,25 @@ class Item(BaseModel):
 
 api = FastAPI()
 
-# -- PLOT --
-def plot(data):
-    df = pd.DataFrame(data)
-    chart = pex.line(data_frame=df)
-    return chart.show()
+
+# -- PLOT CHART FUNCTION --
+def query_to_df(data):
+    df = pd.DataFrame()
+    for row in data:
+        del row.__dict__["_sa_instance_state"]
+        del row.__dict__["id"]
+        df = df.append(row.__dict__, ignore_index=True)
+    return df
+
+
+def plot_chart(data):
+    df = query_to_df(data)
+    chart = pex.line(df, x="school_name", y="total_enrollment")
+
+    return chart.show(renderer="png")
+
+
+# -- REST FUNCTIONS --
 
 
 @api.get("/")
@@ -46,6 +61,7 @@ async def filter_data(
         data = crud.get_dataset_filtered(
             session, school_name, category, gender, more_than, less_than
         )
+    plot_chart(data)
     return data
 
 
