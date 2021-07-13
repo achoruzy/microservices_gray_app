@@ -10,3 +10,4 @@ pandas==1.2.4
 requests==2.25.0
 python-dotenv==0.18.0
 orca
+pytest
