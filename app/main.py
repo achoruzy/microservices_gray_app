@@ -15,7 +15,8 @@ import pandas as pd
 import plotly.express as pex
 import plotly.offline as pof
 
-import schemas, crud
+import schemas
+import crud
 from db import models, database
 
 
@@ -38,7 +39,16 @@ def query_to_df(data):
 
 def plot_chart(data):
     df = query_to_df(data)
-    chart = pex.line(df, x="school_name", y="total_enrollment")
+    chart = pex.bar(df,
+                    x="school_name",
+                    y="total_enrollment",
+                    title="New York Secondary Schools",
+                    labels={"school_name": "School name",
+                            "total_enrollment": "Total enrollment"},
+                    text="total_enrollment",
+                    color="total_enrollment",
+                    color_continuous_scale="teal",
+                    )
 
     return pof.plot(chart)
 
