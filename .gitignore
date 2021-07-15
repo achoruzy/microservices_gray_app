@@ -1,9 +1,9 @@
 *.pyc
 *__pycache__
 .DS_Store
-app/temp_plot.html
-/.vscode
+*plot.html
 
+/.vscode
 /env
 /data
 /logs
