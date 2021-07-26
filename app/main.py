@@ -19,6 +19,8 @@ import schemas
 import crud
 from db import models, database
 
+from worker import celery
+
 
 class Item(BaseModel):
     school_name: str
@@ -50,7 +52,7 @@ def plot_chart(data):
                     color_continuous_scale="teal",
                     )
 
-    return pof.plot(chart)
+    return pof.plot(chart, output_type="div")
 
 
 # -- REST FUNCTIONS --
@@ -58,7 +60,7 @@ def plot_chart(data):
 
 @api.get("/")
 def read_root():
-    return {"Hello": "Kaszebe"}
+    return {"Hello": "github"}
 
 
 @api.get("/filter", response_class=HTMLResponse)
@@ -75,9 +77,9 @@ async def filter_data(
             session, school_name, category, gender, more_than, less_than
         )
 
-    chart_file_path = plot_chart(data)
-    with open("temp-plot.html", "r") as file:
-        return file.read()
+    html_content = plot_chart(data)
+
+    return HTMLResponse(content=html_content, status_code=200)
 
 
 @api.get("/datarow")
