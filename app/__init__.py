@@ -3,6 +3,6 @@
 #   Arkadiusz Choruzy
 #   achoruzy@gmail.com
 
-from . import worker as celery_app
+from .worker import celery as celery_app
 
-__all__ = ['celery_app']
+__all__ = ('celery_app',)
