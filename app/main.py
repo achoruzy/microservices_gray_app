@@ -39,6 +39,7 @@ def query_to_df(data):
     return df
 
 
+@celery.task
 def plot_chart(data):
     df = query_to_df(data)
     chart = pex.bar(df,
@@ -49,10 +50,25 @@ def plot_chart(data):
                             "total_enrollment": "Total enrollment"},
                     text="total_enrollment",
                     color="total_enrollment",
-                    color_continuous_scale="teal",
+                    color_continuous_scale="teal_r",
+                    template="plotly_dark",
+                    opacity=0.7
                     )
 
-    return pof.plot(chart, output_type="div")
+    average = int(df.mean(axis=0)[2])
+
+    chart.add_shape(type="line",
+                    line_color="lightsalmon",
+                    line_width=4, opacity=1,
+                    line_dash="dash",
+                    x0=0, x1=1, xref="paper",
+                    y0=average, y1=average, yref="y"
+                    )
+
+    result_html = pof.plot(chart, output_type="div")
+    print(type(result_html))
+
+    return result_html
 
 
 # -- REST FUNCTIONS --
