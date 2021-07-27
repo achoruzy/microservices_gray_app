@@ -39,6 +39,7 @@ def query_to_df(data):
     return df
 
 
+@celery.task
 def plot_chart(data):
     df = query_to_df(data)
     chart = pex.bar(df,
@@ -64,7 +65,10 @@ def plot_chart(data):
                     y0=average, y1=average, yref="y"
                     )
 
-    return pof.plot(chart, output_type="div")
+    result_html = pof.plot(chart, output_type="div")
+    print(type(result_html))
+
+    return result_html
 
 
 # -- REST FUNCTIONS --
