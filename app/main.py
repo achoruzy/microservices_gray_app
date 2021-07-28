@@ -39,7 +39,7 @@ def query_to_df(data):
     return df
 
 
-@celery.task
+@celery.task(serializer='pickle')
 def plot_chart(data):
     df = query_to_df(data)
     chart = pex.bar(df,
@@ -66,7 +66,6 @@ def plot_chart(data):
                     )
 
     result_html = pof.plot(chart, output_type="div")
-    print(type(result_html))
 
     return result_html
 
@@ -93,9 +92,9 @@ async def filter_data(
             session, school_name, category, gender, more_than, less_than
         )
 
-    html_content = plot_chart(data)
+    html_content = plot_chart.delay(data)
 
-    return HTMLResponse(content=html_content, status_code=200)
+    return HTMLResponse(content=html_content.get(), status_code=200)
 
 
 @api.get("/datarow")
