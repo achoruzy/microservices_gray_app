@@ -5,17 +5,23 @@
 
 import os
 import time
-from celery import Celery
+from celery import Celery, platforms
 from celery.signals import worker_ready
 from db.build import build_db
 
+import main
 
-celery = Celery(__name__)
+# platforms.C_FORCE_ROOT = True
+os.environ.setdefault('C_FORCE_ROOT', 'true')
+
+celery = Celery(__name__, include=['main'])
 celery.conf.broker_url = os.environ.get(
     "CELERY_BROKER_URL", "redis://localhost:6379")
 celery.conf.result_backend = os.environ.get(
-    "CELERY_RESULT_BACKEND", "redis://localhost:6379"
-)
+    "CELERY_RESULT_BACKEND", "redis://localhost:6379")
+celery.conf.update(task_serializer='pickle',
+                   event_serializer='pickle',
+                   accept_content=['pickle', 'json'])
 
 
 @worker_ready.connect
