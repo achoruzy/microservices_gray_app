@@ -80,11 +80,10 @@ def plot_chart(data: Session.query) -> str:
 
     chart.add_shape(type="line",
                     line_color="lightsalmon",
-                    line_width=3, opacity=1,
+                    line_width=2, opacity=1,
                     line_dash="dash",
                     x0=0, x1=1, xref="paper",
-                    y0=average, y1=average, yref="y",
-                    hovertext=f"MEAN VAL = {average}"
+                    y0=average, y1=average, yref="y"
                     )
 
     result_html = pof.plot(chart, output_type="div")
@@ -96,6 +95,8 @@ def plot_chart(data: Session.query) -> str:
 
 @api.get("/", response_class=HTMLResponse)
 def read_root():
+    """ Endpoint returns root page for the service.
+    """
 
     template = r"<html>Hi there!</html>"
 
@@ -110,6 +111,15 @@ async def filter_data(
     more_than: Optional[int] = None,
     less_than: Optional[int] = None,
 ):
+    """ Endpoint returns plotly chart for filtered data.
+
+        Filters:
+            school_name - as in data
+            category - as in data
+            gender - all, female, male
+            more_than - specify a number for gender
+            less_than - specify a number for gender
+    """
 
     with database.SessionLocal() as session:
         data = crud.get_dataset_filtered(
@@ -123,6 +133,8 @@ async def filter_data(
 
 @api.get("/datarow")
 async def datarow(id: int):
+    """ Endpoint returns json data of specified row id from database.
+    """
     with database.SessionLocal() as session:
         data = crud.get_datarow(session, id)
 
@@ -131,6 +143,8 @@ async def datarow(id: int):
 
 @api.get("/all_data")
 async def all_data():
+    """ Endpoint returns json data for entire database.
+    """
     with database.SessionLocal() as session:
         data = crud.get_all(session)
 
