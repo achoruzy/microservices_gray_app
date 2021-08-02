@@ -94,9 +94,12 @@ def plot_chart(data: Session.query) -> str:
 
 # -- REST API FUNCTIONS --
 
-@api.get("/")
+@api.get("/", response_class=HTMLResponse)
 def read_root():
-    return {"Hello": "github"}
+
+    template = r"<html>Hi there!</html>"
+
+    return HTMLResponse(content=template, status_code=200)
 
 
 @api.get("/filter", response_class=HTMLResponse)
