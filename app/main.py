@@ -4,44 +4,64 @@
 #   achoruzy@gmail.com
 
 from typing import Optional
-import dataclasses
 
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 
-from pydantic import BaseModel
 import pandas as pd
 
 import plotly.express as pex
 import plotly.offline as pof
 
+from sqlalchemy.orm import Session
+
+# -- INTERNAL IMPORTS --
 import schemas
 import crud
 from db import models, database
-
 from worker import celery
-
-
-class Item(BaseModel):
-    school_name: str
 
 
 api = FastAPI()
 
 
-# -- PLOT CHART FUNCTION --
-def query_to_df(data):
+# -- PLOT CHART FUNCTIONS --
+
+def query_to_df(data: Session.query) -> pd.DataFrame:
+    """
+    Translates SQLAlchemy query to pandas dataframe with data clean-up.
+
+    Args:
+        data: sqlalchemy.orm.Session.query - SQL dataset got by query
+
+    Returns:
+        pandas.Dataframe
+    """
     df = pd.DataFrame()
+
     for row in data:
+        # query data rows as below has to be removed for proper usage
         del row.__dict__["_sa_instance_state"]
         del row.__dict__["id"]
         df = df.append(row.__dict__, ignore_index=True)
+
     return df
 
 
 @celery.task(serializer='pickle')
-def plot_chart(data):
+def plot_chart(data: Session.query) -> str:
+        """
+    Asynchronised function for chart generation from given data.
+
+    Args:
+        data: sqlalchemy.orm.Session.query - SQL dataset got by query
+
+    Returns:
+        str - chart for data taken as HTML/CSS/js code
+    """
     df = query_to_df(data)
+
+    # PLOTLY CHART 
     chart = pex.bar(df,
                     x="school_name",
                     y="total_enrollment",
@@ -59,7 +79,7 @@ def plot_chart(data):
 
     chart.add_shape(type="line",
                     line_color="lightsalmon",
-                    line_width=4, opacity=1,
+                    line_width=3, opacity=1,
                     line_dash="dash",
                     x0=0, x1=1, xref="paper",
                     y0=average, y1=average, yref="y"
@@ -70,8 +90,7 @@ def plot_chart(data):
     return result_html
 
 
-# -- REST FUNCTIONS --
-
+# -- REST API FUNCTIONS --
 
 @api.get("/")
 def read_root():
@@ -101,6 +120,7 @@ async def filter_data(
 async def datarow(id: int):
     with database.SessionLocal() as session:
         data = crud.get_datarow(session, id)
+
     return data
 
 
@@ -108,4 +128,5 @@ async def datarow(id: int):
 async def all_data():
     with database.SessionLocal() as session:
         data = crud.get_all(session)
+
     return data
