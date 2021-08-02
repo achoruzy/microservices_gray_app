@@ -50,7 +50,7 @@ def query_to_df(data: Session.query) -> pd.DataFrame:
 
 @celery.task(serializer='pickle')
 def plot_chart(data: Session.query) -> str:
-        """
+    """
     Asynchronised function for chart generation from given data.
 
     Args:
@@ -61,7 +61,7 @@ def plot_chart(data: Session.query) -> str:
     """
     df = query_to_df(data)
 
-    # PLOTLY CHART 
+    # PLOTLY CHART
     chart = pex.bar(df,
                     x="school_name",
                     y="total_enrollment",
@@ -75,6 +75,7 @@ def plot_chart(data: Session.query) -> str:
                     opacity=0.7
                     )
 
+    # ADD MEAN LINE
     average = int(df.mean(axis=0)[2])
 
     chart.add_shape(type="line",
@@ -82,7 +83,8 @@ def plot_chart(data: Session.query) -> str:
                     line_width=3, opacity=1,
                     line_dash="dash",
                     x0=0, x1=1, xref="paper",
-                    y0=average, y1=average, yref="y"
+                    y0=average, y1=average, yref="y",
+                    hovertext=f"MEAN VAL = {average}"
                     )
 
     result_html = pof.plot(chart, output_type="div")
