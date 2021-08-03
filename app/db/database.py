@@ -18,7 +18,7 @@ load_dotenv(find_dotenv())
 TABLE = "school_data"
 COLUMNS = {
     "School Name": str,
-    "Category": str,
+    "Category": str,       
     "Total Enrollment": int,
     "#Female": int,
     "#Male": int,

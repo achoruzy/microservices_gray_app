@@ -9,5 +9,6 @@ psycopg2-binary==2.9.1
 pandas==1.2.4
 requests==2.25.0
 python-dotenv==0.18.0
-orca
-pytest
+orca==1.6
+pytest==6.2.4
+jinja2==3.0.0
