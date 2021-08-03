@@ -3,15 +3,18 @@
 #   Arkadiusz Choruzy
 #   achoruzy@gmail.com
 
-from sqlalchemy import Table, Column, Text, Integer
+from sqlalchemy import Column, Text, Integer
 
-from . import database
+# -- INTERNAL IMPORTS --
 from .database import Base, TABLE
 
 
 class Data(Base):
+    """ SQLalchemy ORM model for creation of a database.
+    """
     __tablename__ = TABLE
 
+    # DB columns - has to match with .database.COLUMNS
     id = Column(Integer, primary_key=True)
     school_name = Column(Text, nullable=False, unique=False)
     category = Column(Text, nullable=False, unique=False)
