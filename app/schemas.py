@@ -9,6 +9,7 @@ from pydantic import BaseModel
 
 
 class DataRowBase(BaseModel):
+    """ Base pydantic data model for school data as json. """
     school_name: str
     category: str
     total_enrollment: int
@@ -17,10 +18,12 @@ class DataRowBase(BaseModel):
 
 
 class DataRowCreate(DataRowBase):
+    """ Pydantic data model for inserting new data to school data as json. """
     pass
 
 
 class DataRow(DataRowBase):
+    """ Pydantic data model for single row of school data as json. """
     id: int
 
     class Config:
