@@ -7,16 +7,39 @@ from typing import Optional
 
 from sqlalchemy.orm import Session
 
-import schemas
+# -- INTERNAL IMPORTS --
 from db import models
 
 
 def get_datarow(db: Session, datarow_id: int):
-    return db.query(models.Data).filter(models.Data.id == datarow_id).first()
+    """
+    CRUD's READ function for retrieving only one datarow from a database.
+
+    Args:
+        db: sqlalchemy.orm.Session - session connection to the database
+        datarow_id: int - datarow number to be retrieved
+
+    Returns:
+        json serialised data of desired row
+    """
+    query = db.query(models.Data).filter(models.Data.id == datarow_id).first()
+
+    return query
 
 
 def get_all(db: Session):
-    return db.query(models.Data).all()
+    """
+    CRUD's READ function for retrieving all datarows from a database.
+
+    Args:
+        db: sqlalchemy.orm.Session - session connection to the database
+
+    Returns:
+        json serialised data
+    """
+    query = db.query(models.Data).all()
+
+    return query
 
 
 def get_dataset_filtered(
@@ -27,6 +50,20 @@ def get_dataset_filtered(
     more_than: Optional[int] = None,
     less_than: Optional[int] = None,
 ):
+    """
+    CRUD's READ function for retrieving filtered data from a database.
+
+    Args:
+        db: sqlalchemy.orm.Session - session connection to the database
+        school_name: Optional[str] - data filter
+        category: Optional[str] - data filter
+        gender: Optional[str] - data filter
+        more_than: Optional[int] - data filter
+        less_than: Optional[int] - data filter
+
+    Returns:
+        sqlalchemy.orm.Session.query - all of the filtered data
+    """
 
     query = db.query(models.Data)
 
