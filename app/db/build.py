@@ -3,11 +3,14 @@
 #   Arkadiusz Choruzy
 #   achoruzy@gmail.com
 
-from sqlalchemy import create_engine, MetaData
+from sqlalchemy import MetaData
 import pandas as pd
 import requests
+
+# -- INTERNAL IMPORTS --
 from . import database, models
 
+# CSV file to import into database
 CSV_URL = "https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv"
 
 TABLE = database.TABLE
@@ -15,10 +18,10 @@ COLUMNS = database.COLUMNS
 
 
 def check_csv(url: str) -> bool:
-    """Function checks if the CSV file is available.
+    """Checks if the CSV from URL file is available.
 
-    Params:
-        url (str): an URL link or a filepath to a CSV file
+    Args:
+        url: str - an URL link or a filepath to a CSV file
 
     Returns:
         bool: True if the CSV file is available
@@ -35,14 +38,15 @@ def check_csv(url: str) -> bool:
 
 def cleanup_data(csv_dataframe, columns: dict = COLUMNS):
     """Function cleans up the data got as csv_dataframe and prepares it
-    to be exported into database.
+    to be exported into SQL database.
 
-    Params:
-        scv_dataframe (pandas.DataFrame): a CSV file parsed to pandas.DataFrame object
-        columns (dict: {str: type}): a dictiodnary in type {"column name from csv_dataframe": wanted datatype}
+   Args:
+        scv_dataframe: pandas.DataFrame - a CSV file parsed to pandas.DataFrame object
+        columns: dict: {str: type} - a dictiodnary in type:
+            {"column name from csv_dataframe": used datatype}
 
     Returns:
-        pandas.Dataframe
+        pandas.Dataframe - dataframe ready after clean up
     """
     # Get desired columns to pd.df
     df = pd.DataFrame(
@@ -58,7 +62,8 @@ def cleanup_data(csv_dataframe, columns: dict = COLUMNS):
     # Drop rows with NaN or wrong data
     df = df.dropna(axis=0)
     df = df.drop(
-        df[(df.total_enrollment == "s") | (df.female == "s") | (df.male == "s")].index
+        df[(df.total_enrollment == "s") | (
+            df.female == "s") | (df.male == "s")].index
     )
 
     # Set datatypes for columns
@@ -72,10 +77,10 @@ def cleanup_data(csv_dataframe, columns: dict = COLUMNS):
 
 
 def build_db(csv_url: str = CSV_URL):
-    """Function builds Postgres database with data achived from CSV.
+    """Function builds Postgres SQL database with data got from a CSV file.
 
-    Params:
-        sql_url (str): an URL link or a filepath to a CSV file
+   Args:
+        sql_url: str - an URL link or a filepath to a CSV file
     """
 
     # Check for CSV file
