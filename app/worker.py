@@ -4,17 +4,20 @@
 #   achoruzy@gmail.com
 
 import os
-import time
-from celery import Celery, platforms
+from celery import Celery
 from celery.signals import worker_ready
-from db.build import build_db
 
+# -- INTERNAL IMPORTS --
+from db.build import build_db
 import main
 
-# platforms.C_FORCE_ROOT = True
+
+# -- CELERY CONFIGURATION --
+
 os.environ.setdefault('C_FORCE_ROOT', 'true')
 
 celery = Celery(__name__, include=['main'])
+
 celery.conf.broker_url = os.environ.get(
     "CELERY_BROKER_URL", "redis://localhost:6379")
 celery.conf.result_backend = os.environ.get(
