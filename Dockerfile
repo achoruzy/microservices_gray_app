@@ -10,6 +10,8 @@ ENV PYTHONDONTWRITEBYTECODE 1
 EXPOSE 8080
 
 COPY ./requirements.txt requirements.txt
+COPY ./setup.py setup.py
 RUN pip3 install -r requirements.txt
+RUN pip install -e .
 
 WORKDIR /app

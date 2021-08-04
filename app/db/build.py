@@ -8,7 +8,7 @@ import pandas as pd
 import requests
 
 # -- INTERNAL IMPORTS --
-from . import database, models
+from app.db import database, models
 
 # CSV file to import into database
 CSV_URL = "https://data.cityofnewyork.us/api/views/7yc5-fec2/rows.csv"

@@ -8,7 +8,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 # -- INTERNAL IMPORTS --
-from db import models
+from app.db import models
 
 
 def get_datarow(db: Session, datarow_id: int):

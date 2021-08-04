@@ -16,10 +16,9 @@ import plotly.offline as pof
 from sqlalchemy.orm import Session
 
 # -- INTERNAL IMPORTS --
-import schemas
-import crud
-from db import models, database
-from worker import celery
+import app.crud as crud
+from app.db import models, database
+from app.worker import celery
 
 
 api = FastAPI()

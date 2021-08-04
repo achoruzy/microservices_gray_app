@@ -2,3 +2,5 @@
 #
 #   Arkadiusz Choruzy
 #   achoruzy@gmail.com
+
+from app import main

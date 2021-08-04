@@ -6,7 +6,7 @@
 from sqlalchemy import Column, Text, Integer
 
 # -- INTERNAL IMPORTS --
-from .database import Base, TABLE
+from app.db.database import Base, TABLE
 
 
 class Data(Base):
