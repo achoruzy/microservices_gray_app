@@ -3,7 +3,11 @@
 .DS_Store
 *plot.html
 
+CACHEDIR.TAG
+
 /.vscode
 /env
 /data
 /logs
+/app.egg-info
+/.pytest_cache

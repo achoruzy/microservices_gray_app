@@ -8,8 +8,7 @@ from celery import Celery
 from celery.signals import worker_ready
 
 # -- INTERNAL IMPORTS --
-from db.build import build_db
-import main
+from app.db.build import build_db
 
 
 # -- CELERY CONFIGURATION --
