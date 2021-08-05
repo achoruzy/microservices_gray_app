@@ -26,9 +26,9 @@ def check_csv(url: str) -> bool:
     Returns:
         bool: True if the CSV file is available
     """
-    status_code = requests.get(CSV_URL).status_code
+    status_code = requests.get(url).ok
 
-    if status_code == "200":
+    if status_code:
         print("CSV status code: 200")
         return True
 
@@ -84,7 +84,7 @@ def build_db(csv_url: str = CSV_URL):
     """
 
     # Check for CSV file
-    if not check_csv:
+    if not check_csv(csv_url):
         return Exception("CSV file not found")
 
     # Prepare dataset to match db schema
