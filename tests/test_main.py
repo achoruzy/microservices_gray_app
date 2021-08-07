@@ -36,21 +36,8 @@ def test_read_root():
     assert response.status_code == 200
 
 
-def test_filter():
-    response = client.get("filter?category=Poverty&more_than=650&gender=male")
-
-    assert response.status_code == 200
-
-
 def test_query_to_df():
     with database.SessionLocal() as session:
         data = main.query_to_df(session)
 
         assert type(data) == pd.DataFrame
-
-
-def test_plot_chaart():
-    with database.SessionLocal() as session:
-        data = main.plot_chart(session)
-
-        assert type(data) == str
