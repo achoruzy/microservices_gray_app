@@ -41,7 +41,7 @@ def cleanup_data(csv_dataframe, columns: dict = COLUMNS):
     to be exported into SQL database.
 
    Args:
-        scv_dataframe: pandas.DataFrame - a CSV file parsed to pandas.DataFrame object
+        csv_dataframe: pandas.DataFrame - a CSV file parsed to pandas.DataFrame object
         columns: dict: {str: type} - a dictiodnary in type:
             {"column name from csv_dataframe": used datatype}
 
