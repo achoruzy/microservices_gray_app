@@ -3,6 +3,7 @@
 FROM python:3.9.5-slim-buster
 
 COPY ./app /app
+COPY ./tests /tests
 
 ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE 1
