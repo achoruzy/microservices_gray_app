@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 from app.db import models
 
 
-def get_datarow(db: Session, datarow_id: int):
+def get_datarow(db: Session, datarow_id: int) -> Session.query:
     """
     CRUD's READ function for retrieving only one datarow from a database.
 
