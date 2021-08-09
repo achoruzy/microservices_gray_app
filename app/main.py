@@ -5,8 +5,10 @@
 
 from typing import Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 import pandas as pd
 
@@ -19,9 +21,6 @@ from sqlalchemy.orm import Session
 import app.crud as crud
 from app.db import models, database
 from app.worker import celery
-
-
-api = FastAPI()
 
 
 # -- PLOT CHART FUNCTIONS --
@@ -90,7 +89,15 @@ def plot_chart(data: Session.query) -> str:
     return result_html
 
 
-# -- REST API FUNCTIONS --
+# -- REST API --
+
+api = FastAPI()
+
+api.mount("/static",
+          StaticFiles(directory="static",
+                      name="static"
+                      ))
+
 
 @api.get("/", response_class=HTMLResponse)
 def read_root():
