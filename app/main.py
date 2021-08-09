@@ -93,20 +93,14 @@ def plot_chart(data: Session.query) -> str:
 
 api = FastAPI()
 
-api.mount("/static",
-          StaticFiles(directory="static",
-                      name="static"
-                      ))
+api.mount("/static", StaticFiles(directory="static"), name="static")
+
+templates = Jinja2Templates(directory="templates")
 
 
 @api.get("/", response_class=HTMLResponse)
-def read_root():
-    """ Endpoint returns root page for the service.
-    """
-
-    template = r"<html>Hi there!</html>"
-
-    return HTMLResponse(content=template, status_code=200)
+async def main(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 @api.get("/filter", response_class=HTMLResponse)
