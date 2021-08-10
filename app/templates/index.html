@@ -2,12 +2,30 @@
 <html>
 <head>
     <title>industArk microservices app</title>
+    <link rel="icon" type="image/x-icon" href={{ url_for('static', path='favicon.ico') }}>
     <link rel="stylesheet" type="text/css" href={{ url_for('static', path='style.css') }}>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="Keywords" content="python, docker, fastapi, redis, celery, postgres, sqlalchemy, jinja2, pandas">
     <meta name="Description" content="Web developement project based on microservices that plots plotly chart of user filtered data">
-    <link rel="icon" type="image/x-icon" href={{ url_for('static', path='favicon.ico') }}>
 </head>
 <body>
+    <div class="title_row">
+        <img class="logo" src={{ url_for('static', path='logo.png') }} alt="logo" width=300>
+    </div>
+
+    <div class="text_and_contact">
+    “The books that the world calls immoral are books that show the world its own shame.”
+― Oscar Wilde, The Picture of Dorian Gray 
+    </div>
+
+    <form class="filter_form">
+    </form>
+
+    <div class="tools">
+    </div>
+
+    <div class="copyright">
+    Copyright (C) 2021  Arkadiusz Choruzy
+    </div>
 
 </body>
