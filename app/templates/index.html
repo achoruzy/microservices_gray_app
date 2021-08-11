@@ -18,8 +18,22 @@
 ― Oscar Wilde, The Picture of Dorian Gray</p>
     </div>
     <br>
-    <form class="filter_form">
-    </form>
+    <div class="filter_form">
+        <h4 style="text-align:center">Filter the data</h4>
+        <form action="/filter" method="get" target="_blank">
+            <select id="school_name" name="school_name">
+                <option value="">all</option>
+            </select>
+            <select id="category" name="category">
+                <option value="">all</option>
+            </select>
+            <select id="gender" name="gender">
+                <option value="">all</option>
+            </select>
+
+            <input type="submit" value="Plot the chart!">
+        </form>
+    </div>
     <br>
     <div class="tools" style="text-align:center">
         <a href="https://github.com/industArk/microservices_app" target="_blank">github repository</a>
