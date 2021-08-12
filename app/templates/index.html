@@ -21,15 +21,28 @@
     <div class="filter_form">
         <h4 style="text-align:center">Filter the data</h4>
         <form action="/filter" method="get" target="_blank">
+
+            <label for="school_name">School: </label>
             <select id="school_name" name="school_name">
-                <option value="">all</option>
+                <option disabled selected value>-- all or choose an option --</option>
+
+
             </select>
+            <br>
+            <label for="category">Category: </label>
             <select id="category" name="category">
-                <option value="">all</option>
+                <option disabled selected value>-- all or choose an option --</option>
+
+
             </select>
+            <br>
+            <label for="gender">Gender: </label>
             <select id="gender" name="gender">
-                <option value="">all</option>
+                <option disabled selected value>-- both or choose an option --</option>
+                <option value="male">male</option>
+                <option value="female">female</option>
             </select>
+            <br>
 
             <input type="submit" value="Plot the chart!">
         </form>
