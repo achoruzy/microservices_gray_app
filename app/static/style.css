@@ -57,6 +57,14 @@ body {
     text-align: center;
 }
 
+h4 {
+    margin-bottom: 0%;
+}
+
+h6 {
+    margin: 0%;
+}
+
 br {
     line-height: 150%;
 }
