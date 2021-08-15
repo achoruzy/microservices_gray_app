@@ -30,7 +30,7 @@
         then uploaded into SQL base.
         </p>
         <p>
-        The project is finished. However, there are still some issues and areas for improvement. 
+        The project is finished. However, there are still few issues and areas for improvement. 
         </p>   
         </div>
     <br>
@@ -41,19 +41,25 @@
 
             <label for="category">Category: </label>
             <select id="category" name="category">
-                <option disabled selected value>-- all or choose an option --</option>
+                <option disabled selected value>-- choose an option --</option>
 
-            {% for option in ["car", "bike", "plane"] %}
-            <option value={{ option }}>{{ option }}</option>
-            {% endfor %}
+                {% for option in ["All Students",
+                "Students with Disabilities",
+                "Attend school outside district of residence",
+                "Reside in temporary housing",
+                "English Language Learners",
+                "Poverty"] %}
+                <option value={{ option }}>{{ option }}</option>
+                {% endfor %}
 
             </select>
             <br>
             <label for="gender">Gender: </label>
             <select id="gender" name="gender">
-                <option disabled selected value>-- both or choose an option --</option>
-                <option value="male">male</option>
-                <option value="female">female</option>
+                <option disabled selected value>-- choose an option --</option>
+                {% for option in ["all", "girls", "boys"] %}
+                <option value={{ option }}>{{ option }}</option>
+                {% endfor %}
             </select>
             <br>
             <label id="label_2" for="more_than"> Where is more than </label>
