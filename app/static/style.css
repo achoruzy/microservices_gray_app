@@ -47,8 +47,7 @@ body {
 }
 
 .copyright {
-    position: absolute;
-    bottom: 5%;
+    margin-bottom: 20px;
     width: 99%;
     padding: 3;
     color: rgb(20, 20, 20);
