@@ -39,17 +39,13 @@
         <h4 style="text-align:center">Filter the data</h4>
         <form action="/filter" method="get" target="_blank">
 
-            <label for="school_name">School: </label>
-            <select id="school_name" name="school_name">
-                <option disabled selected value>-- all or choose an option --</option>
-
-
-            </select>
-            <br>
             <label for="category">Category: </label>
             <select id="category" name="category">
                 <option disabled selected value>-- all or choose an option --</option>
 
+            {% for option in ["car", "bike", "plane"] %}
+            <option value={{ option }}>{{ option }}</option>
+            {% endfor %}
 
             </select>
             <br>
