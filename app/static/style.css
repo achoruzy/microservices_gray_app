@@ -95,13 +95,19 @@ a:active {
 select {
     width: 70%;
     border: none;
-    background-color: rgb(60, 60, 60);
+    background: rgb(60, 60, 60);
     padding: 10px 20px;
     margin: 4px 4%;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
+
+select:hover {
+    background-color: rgb(40, 40, 40);
+    color: rgb(80, 80, 80)
+}
+
 
 label {
     padding-left: 10px;
@@ -148,6 +154,11 @@ input[type=submit] {
   }
   
 input[type=submit]:hover {
+    background-color: rgb(40, 40, 40);
+    color: rgb(80, 80, 80)
+}
+
+input:hover {
     background-color: rgb(40, 40, 40);
     color: rgb(80, 80, 80)
 }
