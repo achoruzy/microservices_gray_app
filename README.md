@@ -55,9 +55,8 @@ Arkadiusz Choruży
 
 ## License
 
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
+This project is licensed under the MIT License - see the LICENSE.md file for details
 
 ## Acknowledgments
-
-Inspiration, code snippets, etc.
+Project started as an answer for:
 * [Igor 'IOR88' Miazek's coding-challenge](https://github.com/IOR88)
